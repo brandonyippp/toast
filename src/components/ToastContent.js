@@ -1,6 +1,6 @@
 import React from "react";
 import Content from "./ui/Content";
-import { Snackbar } from "@mui/material";
+import { SnackbarContent } from "@mui/material";
 
 const ToastContent = ({ toasts = [], ...props }) => {
   return (
@@ -11,11 +11,20 @@ const ToastContent = ({ toasts = [], ...props }) => {
         right: 16, // distance from the right side of the page
         zIndex: 9999,
         display: "flex",
-        flexDirection: "column-reverse", // This ensures that the newest notification is at the bottom
+        flexDirection: "column-reverse", // This ensures that the newest notification is at the top
         gap: 1, // spacing between notifications
-        border: "1px solid red",
+        maxHeight: "80vh", // Adjust this value as needed
+        overflowY: "auto", // Enable vertical scrolling
+        overflowX: "hidden", // Prevent horizontal scrolling
       }}
-    ></Content>
+    >
+      {toasts.map((toast) => (
+        <SnackbarContent
+          sx={{ whiteSpace: "pre-wrap" }}
+          message={`${toast.firstName + " " + toast.lastName}\n${toast.email}`}
+        />
+      ))}
+    </Content>
   );
 };
 

@@ -6,14 +6,18 @@ import FormSubmissionsContent from "./components/FormSubmissionsContent";
 import Header from "./components/ui/Header";
 import ToastContent from "./components/ToastContent";
 
+import { createMockFormSubmission } from "./service/mockServer";
+
 function App() {
-  const [pendingSubmissions, setPendingSubmissions] = useState(
-    JSON.parse(localStorage.getItem("pendingSubmissions")) || []
-  );
+  const [pendingSubmissions, setPendingSubmissions] = useState([]);
 
   // register the callback for mockServer.js to use whenever new form submission is made.
   useEffect(() => {
     onMessage(storePendingSubmissions);
+
+    setPendingSubmissions(
+      JSON.parse(localStorage.getItem("pendingSubmissions")) || []
+    );
   }, []);
 
   // Do it this way so you don't see a flicker on toasts[] components, (e.g) you create a state var for toasts and starts as empty arr
@@ -21,11 +25,20 @@ function App() {
     return pendingSubmissions;
   }, [pendingSubmissions]);
 
-  console.log(toasts);
+  // User presses "New Submission" button
+  const onSubmit = () => {
+    createMockFormSubmission();
+
+    setPendingSubmissions(
+      JSON.parse(localStorage.getItem("pendingSubmissions"))
+    );
+  };
+
+  // localStorage.clear();
 
   return (
     <>
-      <Header />
+      <Header onSubmit={onSubmit} />
       <Container>
         <FormSubmissionsContent title={"Liked Form Submissions"} />
       </Container>
