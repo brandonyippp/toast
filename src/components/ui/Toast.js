@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { SnackbarContent, Button } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";

@@ -1,4 +1,14 @@
 import { LOCAL_STORAGE_PENDING_SUBMISSIONS } from "./constants";
+/**
+ * NOTE: There wouldn't be a need to having pendingSubmissions at all, however I have done so for the following reasons:
+ *  1. Being unable to edit anything within mockServer.js, I wanted to implement a solution that would allow Toast data to persist
+ *      between refreshes, ultimately being a better end-user experience due to not losing potentially vital information on browser
+ *      crash or refresh.
+ *
+ *  2. Expanding on the importance on not being able to edit mockServer.js, if say a new user signed up and was placed into the
+ *      formSubmissions localStorage table instead, then the saveLikedFormSubmissions function would simply be doing something along
+ *      the lines of "take what's already there and put it in again", which felt redundant.
+ */
 
 // Assign a callback to the callbacks[] array found in mockServer.js -> stores generated user data on button press
 export const storePendingSubmissions = (user_data) => {
@@ -41,22 +51,21 @@ export const retry = async (fn, retries = 3, delay = 1000) => {
   }
 };
 
-// Filter local storage based on one value exclusion (val)
-export const filterLocalStorage = (key, property, val) => {
-  const storage = JSON.parse(localStorage.getItem(key));
-  const filteredStorage = storage.filter(
-    (obj) => obj && obj[`${property}`] !== val
-  );
+export const mergeLocalStorageArrays = (keys) => {
+  const mergedArray = keys.reduce((acc, key) => {
+    try {
+      const storedValue = JSON.parse(localStorage.getItem(key)) || [];
+      if (Array.isArray(storedValue)) {
+        return acc.concat(storedValue);
+      } else {
+        console.warn(`Value for key "${key}" is not an array.`);
+        return acc;
+      }
+    } catch (error) {
+      console.error(`Error parsing data for key "${key}":`, error);
+      return acc;
+    }
+  }, []);
 
-  return filteredStorage;
-};
-
-// Update local storage & set state accordingly based on values returned from filterLocalStorage
-export const updateStorageAndState = (key, filteredData, setState) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(filteredData));
-    setState(filteredData);
-  } catch (error) {
-    console.error("Error updating localStorage or state:", error);
-  }
+  return mergedArray;
 };
