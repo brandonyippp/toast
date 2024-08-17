@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import FormSubmissionsContent from "./components/FormSubmissionsContent";
-import { LOCAL_STORAGE_PENDING_SUBMISSIONS } from "./utils/constants";
+import {
+  LOCAL_STORAGE_LIKED_SUBMISSIONS,
+  LOCAL_STORAGE_PENDING_SUBMISSIONS,
+} from "./utils/constants";
 import ToastContent from "./components/ToastContent";
 import { onMessage } from "./service/mockServer";
 import Container from "@mui/material/Container";
@@ -32,9 +35,13 @@ function App() {
     setPendingSubmissions(
       JSON.parse(localStorage.getItem(LOCAL_STORAGE_PENDING_SUBMISSIONS)) || []
     );
+
+    setLikedSubmissions(
+      JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIKED_SUBMISSIONS))
+    );
   }, []);
 
-  // Generate mock data for toast notification purposes
+  // Generates a toast notification with generated user data from mockServer api
   const onSubmit = () => {
     try {
       createMockFormSubmission();
@@ -47,23 +54,27 @@ function App() {
     }
   };
 
+  // Removes 'liked' toast from list of toasts after successfully adding it to the 'liked' list of submissions
   const handleToastLike = async (toast) => {
     const saveFormSubmission = () => saveLikedFormSubmission(toast);
-
     try {
       const result = await retry(saveFormSubmission, 3, 1000); // Retry up to 3 times with 1 second delay
-      console.log(result); // Handle success
+      console.log(result);
 
+      // Remove submission from being displayed as a toast
       const filteredStorage = filterLocalStorage(
         LOCAL_STORAGE_PENDING_SUBMISSIONS,
         "id",
         toast.id
       );
-
       updateStorageAndState(
         LOCAL_STORAGE_PENDING_SUBMISSIONS,
         filteredStorage,
         setPendingSubmissions
+      );
+
+      setLikedSubmissions(
+        JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIKED_SUBMISSIONS))
       );
     } catch (error) {
       console.error("Failed to save form submission after retries:", error);
@@ -71,6 +82,7 @@ function App() {
     }
   };
 
+  // Removes the submission in question from the list, deleted forever
   const handleToastClose = (id) => {
     try {
       const filteredStorage = filterLocalStorage(
@@ -79,6 +91,7 @@ function App() {
         id
       );
 
+      // Remove submission from being displayed as a toast
       updateStorageAndState(
         LOCAL_STORAGE_PENDING_SUBMISSIONS,
         filteredStorage,

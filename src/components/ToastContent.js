@@ -20,6 +20,7 @@ const ToastContent = ({ toasts = [], handleClose, ...props }) => {
     >
       {toasts.map((toast) => (
         <Toast
+          key={toast.id}
           toast={toast}
           sx={{ whiteSpace: "pre-wrap" }}
           message={`${toast.firstName + " " + toast.lastName}\n${toast.email}`}

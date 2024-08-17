@@ -41,6 +41,7 @@ export const retry = async (fn, retries = 3, delay = 1000) => {
   }
 };
 
+// Filter local storage based on one value exclusion (val)
 export const filterLocalStorage = (key, property, val) => {
   const storage = JSON.parse(localStorage.getItem(key));
   const filteredStorage = storage.filter(

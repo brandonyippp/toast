@@ -4,6 +4,7 @@ import Content from "./ui/Content";
 
 const FormSubmissionsContent = ({
   title = "Liked Form Submissions",
+  submissions = [],
   ...props
 }) => {
   return (
