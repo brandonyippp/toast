@@ -8,7 +8,7 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
-// Assign default value of null. Ideally just use TS and use PropTypes & declare props via 'type', e.g type HeaderProps = {...types}
+// Assign default value of null. Ideally just use TS, use PropTypes & declare props via 'type', e.g type HeaderProps = {...types}
 export default function Header({ onSubmit = null, ...props }) {
   return (
     <Box sx={{ flexGrow: 1 }}>

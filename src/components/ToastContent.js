@@ -1,8 +1,8 @@
 import React from "react";
 import Content from "./ui/Content";
-import { SnackbarContent } from "@mui/material";
+import Toast from "./ui/Toast";
 
-const ToastContent = ({ toasts = [], ...props }) => {
+const ToastContent = ({ toasts = [], handleClose, ...props }) => {
   return (
     <Content
       sx={{
@@ -19,9 +19,12 @@ const ToastContent = ({ toasts = [], ...props }) => {
       }}
     >
       {toasts.map((toast) => (
-        <SnackbarContent
+        <Toast
+          toast={toast}
           sx={{ whiteSpace: "pre-wrap" }}
           message={`${toast.firstName + " " + toast.lastName}\n${toast.email}`}
+          handleClose={handleClose}
+          handleToastLike={props.handleToastLike}
         />
       ))}
     </Content>
