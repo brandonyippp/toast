@@ -51,6 +51,26 @@ export const retry = async (fn, retries = 3, delay = 1000) => {
   }
 };
 
+// Filter local storage based on one value exclusion (val)
+export const filterLocalStorage = (key, property, val) => {
+  const storage = JSON.parse(localStorage.getItem(key));
+  const filteredStorage = storage.filter(
+    (obj) => obj && obj[`${property}`] !== val
+  );
+
+  return filteredStorage;
+};
+
+// Update local storage & set state accordingly based on values returned from filterLocalStorage
+export const updateStorageAndState = (key, filteredData, setState) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(filteredData));
+    setState(filteredData);
+  } catch (error) {
+    console.error("Error updating localStorage or state:", error);
+  }
+};
+
 export const mergeLocalStorageArrays = (keys) => {
   const mergedArray = keys.reduce((acc, key) => {
     try {
@@ -68,4 +88,10 @@ export const mergeLocalStorageArrays = (keys) => {
   }, []);
 
   return mergedArray;
+};
+
+export const mergeAndSetSubmissions = (keys, setStateFn) => {
+  const storageSubmissions = mergeLocalStorageArrays(keys);
+
+  setStateFn(storageSubmissions);
 };

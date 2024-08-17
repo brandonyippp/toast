@@ -12,13 +12,13 @@ const Toast = ({
   },
   ...props
 }) => {
-  const handleToastLike = () => {
-    props.handleToastLike(toast);
-  };
-
   const action = (
     <>
-      <Button color="secondary" size="small" onClick={() => handleToastLike()}>
+      <Button
+        color="secondary"
+        size="small"
+        onClick={() => props.handleToastLike(toast) || null}
+      >
         Like
       </Button>
       <IconButton
