@@ -2,7 +2,7 @@ import React from "react";
 import Content from "./ui/Content";
 import Toast from "./ui/Toast";
 
-const ToastContent = ({ toasts = [], handleClose, ...props }) => {
+const ToastContent = ({ toasts = null, handleClose, ...props }) => {
   return (
     <Content
       sx={{

@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import FormSubmissionsContent from "./components/FormSubmissionsContent";
-import {
-  LOCAL_STORAGE_LIKED_SUBMISSIONS,
-  LOCAL_STORAGE_PENDING_SUBMISSIONS,
-} from "./utils/constants";
+import FormSubmissionsHeader from "./components/FormSubmissionsHeader";
+import { LOCAL_STORAGE_PENDING_SUBMISSIONS } from "./utils/constants";
+import LoadingOverlay from "./components/ui/LoadingOverlay";
 import ToastContent from "./components/ToastContent";
 import { onMessage } from "./service/mockServer";
 import Container from "@mui/material/Container";
@@ -12,57 +11,79 @@ import {
   storePendingSubmissions,
   retry,
   filterLocalStorage,
-  mergeAndSetSubmissions,
 } from "./utils/helpers";
 import {
   createMockFormSubmission,
   saveLikedFormSubmission,
+  fetchLikedFormSubmissions,
 } from "./service/mockServer";
 
 function App() {
   const [submissions, setSubmissions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Avoid a flicker on initial load by avoiding useState & useEffect loading
-  const toasts = useMemo(() => {
-    return submissions.filter((submission) => !submission.liked);
-  }, [submissions]);
+  // Memoize toasts and liked_submissions
+  const toasts = useMemo(
+    () => submissions.filter((submission) => !submission.liked),
+    [submissions]
+  );
+  const liked_submissions = useMemo(
+    () => submissions.filter((submission) => submission.liked),
+    [submissions]
+  );
 
-  const liked = useMemo(() => {
-    return submissions.filter((submission) => submission.liked);
-  }, [submissions]);
-
-  // register the callback for mockServer.js to use whenever new form submission is made.
+  // Fetch and merge storage data on mount
   useEffect(() => {
-    onMessage(storePendingSubmissions);
+    const fetchAndMergeStorage = async () => {
+      setLoading(true);
+      try {
+        const { formSubmissions } = await retry(
+          fetchLikedFormSubmissions,
+          3,
+          1000
+        );
+        const pendingSubmissions =
+          JSON.parse(localStorage.getItem(LOCAL_STORAGE_PENDING_SUBMISSIONS)) ||
+          [];
+        const concatenated = [...formSubmissions, ...pendingSubmissions];
+        setSubmissions(concatenated);
+      } catch (error) {
+        console.error("Failed to fetch liked forms after retries:", error);
+        // Optional: Notify user of error
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    mergeAndSetSubmissions(
-      [LOCAL_STORAGE_LIKED_SUBMISSIONS, LOCAL_STORAGE_PENDING_SUBMISSIONS],
-      setSubmissions
-    );
+    onMessage(storePendingSubmissions);
+    fetchAndMergeStorage();
   }, []);
 
-  // Generates a toast notification with generated user data from mockServer api
+  // Handle submission creation
   const onSubmit = () => {
     try {
       createMockFormSubmission();
-      mergeAndSetSubmissions(
-        [LOCAL_STORAGE_LIKED_SUBMISSIONS, LOCAL_STORAGE_PENDING_SUBMISSIONS],
-        setSubmissions
+      const pendingSubmissions =
+        JSON.parse(localStorage.getItem(LOCAL_STORAGE_PENDING_SUBMISSIONS)) ||
+        [];
+      const newSubmissions = pendingSubmissions.filter(
+        (submission) =>
+          !submissions.some((existing) => existing.id === submission.id)
       );
+      setSubmissions((prev) => [...prev, ...newSubmissions]);
     } catch (error) {
       console.log(error);
     }
   };
 
-  // Removes 'liked' toast from list of toasts after successfully adding it to the 'liked' list of submissions
+  // Handle liking a toast
   const handleToastLike = async (toast) => {
     const saveFormSubmission = () =>
       saveLikedFormSubmission({ ...toast, liked: true });
-    try {
-      const result = await retry(saveFormSubmission, 3, 1000); // Retry up to 3 times with 1 second delay
-      console.log(result);
 
-      // Remove the toast that was just liked from the 'pendingStorage' localStorage table
+    setLoading(true);
+    try {
+      await retry(saveFormSubmission, 3, 1000);
       const filteredStorage = filterLocalStorage(
         LOCAL_STORAGE_PENDING_SUBMISSIONS,
         "id",
@@ -72,21 +93,24 @@ function App() {
         LOCAL_STORAGE_PENDING_SUBMISSIONS,
         JSON.stringify(filteredStorage)
       );
-
-      mergeAndSetSubmissions(
-        [LOCAL_STORAGE_LIKED_SUBMISSIONS, LOCAL_STORAGE_PENDING_SUBMISSIONS],
-        setSubmissions
+      setSubmissions((prev) =>
+        prev.map((submission) =>
+          submission.id === toast.id
+            ? { ...submission, liked: true }
+            : submission
+        )
       );
     } catch (error) {
       console.error("Failed to save form submission after retries:", error);
-      // Handle failure after retries (e.g., notify user or log error)
+      // Optional: Notify user of error
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Removes the submission in question from the list, deleted forever
+  // Handle closing a toast
   const handleToastClose = (id) => {
     try {
-      // Remove the toast that was just closed from the 'pendingStorage' localStorage table
       const filteredStorage = filterLocalStorage(
         LOCAL_STORAGE_PENDING_SUBMISSIONS,
         "id",
@@ -96,23 +120,23 @@ function App() {
         LOCAL_STORAGE_PENDING_SUBMISSIONS,
         JSON.stringify(filteredStorage)
       );
-
-      mergeAndSetSubmissions(
-        [LOCAL_STORAGE_LIKED_SUBMISSIONS, LOCAL_STORAGE_PENDING_SUBMISSIONS],
-        setSubmissions
+      setSubmissions((prev) =>
+        prev.filter((submission) => submission.id !== id)
       );
     } catch (error) {
       console.log(error);
     }
   };
 
-  // localStorage.clear();
-
   return (
     <>
-      <Header onSubmit={onSubmit} />
+      <LoadingOverlay open={loading} />
+      <FormSubmissionsHeader onSubmit={onSubmit} />
       <Container>
-        <FormSubmissionsContent title={"Liked Form Submissions"} />
+        <FormSubmissionsContent
+          title={"Liked Form Submissions"}
+          liked_submissions={liked_submissions}
+        />
       </Container>
       <ToastContent
         toasts={toasts}

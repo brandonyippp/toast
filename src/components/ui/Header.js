@@ -9,7 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
 // Assign default value of null. Ideally just use TS, use PropTypes & declare props via 'type', e.g type HeaderProps = {...types}
-export default function Header({ onSubmit = null, ...props }) {
+export default function Header(props) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -22,17 +22,7 @@ export default function Header({ onSubmit = null, ...props }) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Toast Exercise
-          </Typography>
-          <Button
-            variant="contained"
-            size="small"
-            color="secondary"
-            onClick={onSubmit}
-          >
-            New Submission
-          </Button>
+          {props.children}
         </Toolbar>
       </AppBar>
     </Box>

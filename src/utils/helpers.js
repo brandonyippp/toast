@@ -70,28 +70,3 @@ export const updateStorageAndState = (key, filteredData, setState) => {
     console.error("Error updating localStorage or state:", error);
   }
 };
-
-export const mergeLocalStorageArrays = (keys) => {
-  const mergedArray = keys.reduce((acc, key) => {
-    try {
-      const storedValue = JSON.parse(localStorage.getItem(key)) || [];
-      if (Array.isArray(storedValue)) {
-        return acc.concat(storedValue);
-      } else {
-        console.warn(`Value for key "${key}" is not an array.`);
-        return acc;
-      }
-    } catch (error) {
-      console.error(`Error parsing data for key "${key}":`, error);
-      return acc;
-    }
-  }, []);
-
-  return mergedArray;
-};
-
-export const mergeAndSetSubmissions = (keys, setStateFn) => {
-  const storageSubmissions = mergeLocalStorageArrays(keys);
-
-  setStateFn(storageSubmissions);
-};
