@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import FormSubmissionsContent from "./components/FormSubmissionsContent";
 import FormSubmissionsHeader from "./components/FormSubmissionsHeader";
-import { LOCAL_STORAGE_PENDING_SUBMISSIONS } from "./utils/constants";
+import {
+  LOCAL_STORAGE_PENDING_SUBMISSIONS,
+  LOCAL_STORAGE_LIKED_SUBMISSIONS,
+} from "./utils/constants";
 import LoadingOverlay from "./components/ui/LoadingOverlay";
 import ToastContent from "./components/ToastContent";
 import { onMessage } from "./service/mockServer";
 import Container from "@mui/material/Container";
-import Header from "./components/ui/Header";
 import {
   storePendingSubmissions,
   retry,
@@ -128,6 +130,28 @@ function App() {
     }
   };
 
+  const onDelete = (id) => {
+    try {
+      setLoading(true);
+      const filteredStorage = filterLocalStorage(
+        LOCAL_STORAGE_LIKED_SUBMISSIONS,
+        "id",
+        id
+      );
+      localStorage.setItem(
+        LOCAL_STORAGE_LIKED_SUBMISSIONS,
+        JSON.stringify(filteredStorage)
+      );
+      setSubmissions((prev) =>
+        prev.filter((submission) => submission.id !== id)
+      );
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <LoadingOverlay open={loading} />
@@ -136,6 +160,7 @@ function App() {
         <FormSubmissionsContent
           title={"Liked Form Submissions"}
           liked_submissions={liked_submissions}
+          onDelete={onDelete}
         />
       </Container>
       <ToastContent

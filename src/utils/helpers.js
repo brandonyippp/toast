@@ -60,13 +60,3 @@ export const filterLocalStorage = (key, property, val) => {
 
   return filteredStorage;
 };
-
-// Update local storage & set state accordingly based on values returned from filterLocalStorage
-export const updateStorageAndState = (key, filteredData, setState) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(filteredData));
-    setState(filteredData);
-  } catch (error) {
-    console.error("Error updating localStorage or state:", error);
-  }
-};

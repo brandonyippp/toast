@@ -1,6 +1,6 @@
 import React from "react";
 import Content from "./ui/Content";
-import Toast from "./ui/Toast";
+import Toast from "./SubmissionToast";
 
 const ToastContent = ({ toasts = null, handleClose, ...props }) => {
   return (

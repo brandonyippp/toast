@@ -1,15 +1,22 @@
 import React from "react";
-import { Card, CardContent, Typography, Avatar } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Avatar,
+  IconButton,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete"; // Import the trash can icon
 
-const SubmissionCard = ({ submission }) => {
+const SubmissionCard = ({ submission, onDelete }) => {
   return (
-    <Card sx={{ display: "flex", marginBottom: 2 }}>
+    <Card sx={{ display: "flex", marginBottom: 2, position: "relative" }}>
       <Avatar
-        alt={submission.firstName + submission.lastName}
+        alt={submission.firstName + " " + submission.lastName}
         src={submission.avatarUrl}
         sx={{ width: 56, height: 56, margin: 2 }}
       />
-      <CardContent sx={{ flex: "1 0 auto" }}>
+      <CardContent sx={{ flex: "1 0 auto", paddingRight: 6 }}>
         <Typography variant="h6" component="div">
           {submission.firstName} {submission.lastName}
         </Typography>
@@ -17,6 +24,17 @@ const SubmissionCard = ({ submission }) => {
           {submission.email}
         </Typography>
       </CardContent>
+      <IconButton
+        color="error"
+        onClick={() => onDelete(submission.id)}
+        sx={{
+          position: "absolute",
+          top: 16,
+          right: 16,
+        }}
+      >
+        <DeleteIcon />
+      </IconButton>
     </Card>
   );
 };
