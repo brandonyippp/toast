@@ -1,7 +1,7 @@
 import React from "react";
 import Typography from "@mui/material/Typography";
-import Content from "./ui/Content";
 import SubmissionCard from "./ui/SubmissionCard";
+import Content from "./ui/Content";
 
 const FormSubmissionsContent = ({
   title = "Liked Form Submissions",

@@ -1,7 +1,6 @@
 import React from "react";
+import { Typography, Button } from "@mui/material";
 import Header from "./ui/Header";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 
 const FormSubmissionsHeader = ({ onSubmit, ...props }) => {
   return (

@@ -6,7 +6,7 @@ import {
   Avatar,
   IconButton,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete"; // Import the trash can icon
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const SubmissionCard = ({ submission, onDelete }) => {
   return (
