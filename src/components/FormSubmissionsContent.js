@@ -1,6 +1,6 @@
 import React from "react";
-import Typography from "@mui/material/Typography";
-import SubmissionCard from "./ui/SubmissionCard";
+import { Typography } from "@mui/material";
+import SubmissionCard from "./SubmissionCard";
 import Content from "./ui/Content";
 
 const FormSubmissionsContent = ({
