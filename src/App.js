@@ -24,7 +24,7 @@ function App() {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Memoize toasts and liked_submissions
+  // Memoize toasts and liked_submissions to avoid app flickers
   const toasts = useMemo(
     () => submissions.filter((submission) => !submission.liked),
     [submissions]
@@ -39,19 +39,23 @@ function App() {
     const fetchAndMergeStorage = async () => {
       setLoading(true);
       try {
+        // Get the liked submissions in db
         const { formSubmissions } = await retry(
           fetchLikedFormSubmissions,
           3,
           1000
         );
+
+        // Get pending submissions (toasts) from db
         const pendingSubmissions =
           JSON.parse(localStorage.getItem(LOCAL_STORAGE_PENDING_SUBMISSIONS)) ||
           [];
+
+        // Merge both 'liked' and 'pending' (toasts) into one list
         const concatenated = [...formSubmissions, ...pendingSubmissions];
         setSubmissions(concatenated);
       } catch (error) {
         console.error("Failed to fetch liked forms after retries:", error);
-        // Optional: Notify user of error
       } finally {
         setLoading(false);
       }
@@ -68,11 +72,15 @@ function App() {
       const pendingSubmissions =
         JSON.parse(localStorage.getItem(LOCAL_STORAGE_PENDING_SUBMISSIONS)) ||
         [];
-      const newSubmissions = pendingSubmissions.filter(
+
+      // Find the submission that was just created
+      const newSubmission = pendingSubmissions.filter(
         (submission) =>
           !submissions.some((existing) => existing.id === submission.id)
       );
-      setSubmissions((prev) => [...prev, ...newSubmissions]);
+
+      // Add it to state
+      setSubmissions((prev) => [...prev, ...newSubmission]);
     } catch (error) {
       console.log(error);
     }
@@ -82,19 +90,23 @@ function App() {
   const handleToastLike = async (toast) => {
     const saveFormSubmission = () =>
       saveLikedFormSubmission({ ...toast, liked: true });
-
     setLoading(true);
     try {
+      // Request api to put toast into liked submissions table
       await retry(saveFormSubmission, 3, 1000);
       const filteredStorage = filterLocalStorage(
         LOCAL_STORAGE_PENDING_SUBMISSIONS,
         "id",
         toast.id
       );
+
+      // Remove the toast that was just liked from being a toast any longer
       localStorage.setItem(
         LOCAL_STORAGE_PENDING_SUBMISSIONS,
         JSON.stringify(filteredStorage)
       );
+
+      // Update state to reflect proper 'liked' value for recently changed submission
       setSubmissions((prev) =>
         prev.map((submission) =>
           submission.id === toast.id
@@ -113,6 +125,7 @@ function App() {
   // Handle closing a toast
   const handleToastClose = (id) => {
     try {
+      // Remove toast that user closed from local storage
       const filteredStorage = filterLocalStorage(
         LOCAL_STORAGE_PENDING_SUBMISSIONS,
         "id",
@@ -122,6 +135,8 @@ function App() {
         LOCAL_STORAGE_PENDING_SUBMISSIONS,
         JSON.stringify(filteredStorage)
       );
+
+      // Update state accordingly to remove the closed toast/submission
       setSubmissions((prev) =>
         prev.filter((submission) => submission.id !== id)
       );
@@ -130,18 +145,24 @@ function App() {
     }
   };
 
+  // User can delete liked submissions
   const onDelete = (id) => {
+    setLoading(true);
     try {
-      setLoading(true);
+      // Find liked submission user wants to delete & remove it
       const filteredStorage = filterLocalStorage(
         LOCAL_STORAGE_LIKED_SUBMISSIONS,
         "id",
         id
       );
+
+      // Reflect removal in db
       localStorage.setItem(
         LOCAL_STORAGE_LIKED_SUBMISSIONS,
         JSON.stringify(filteredStorage)
       );
+
+      // Update state accordingly
       setSubmissions((prev) =>
         prev.filter((submission) => submission.id !== id)
       );

@@ -5,9 +5,6 @@ const Toast = ({
   toast,
   sx = { whiteSpace: "pre-wrap" },
   message = "",
-  handleClose = () => {
-    console.log("Implement a handleClose() function");
-  },
   ...props
 }) => {
   return <SnackbarContent sx={sx} message={message} {...props} />;
