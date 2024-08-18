@@ -53,6 +53,13 @@ export const retry = async (fn, retries = 3, delay = 1000) => {
 
 // Filter local storage based on one value exclusion (val)
 export const filterLocalStorage = (key, property, val) => {
+  /**
+   *  Key = what key:value pair in localStorage you're trying to delete from
+   *  Property = What property in the respective key:value pair you're trying to delete, e.g id literal from in user.id
+   *  Value = The value literal of the property, e.g user.id === 1234
+   *
+   *  Example: filterLocalStorage("pendingSubmissions", "id", 1234) -> Filter out the entry in the pendingSubmissions table that has a .id value ==== 1234
+   */
   const storage = JSON.parse(localStorage.getItem(key));
   const filteredStorage = storage.filter(
     (obj) => obj && obj[`${property}`] !== val
