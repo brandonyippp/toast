@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import FormSubmissionsContent from "./components/FormSubmissionsContent";
 import FormSubmissionsHeader from "./components/FormSubmissionsHeader";
 import {
@@ -86,8 +86,9 @@ function App() {
     }
   };
 
+  // Use useCallback to prevent toast content component from being re-rendered on every App re-render
   // Handle liking a toast
-  const handleToastLike = async (toast) => {
+  const handleToastLike = useCallback(async (toast) => {
     const saveFormSubmission = () =>
       saveLikedFormSubmission({ ...toast, liked: true });
     setLoading(true);
@@ -120,10 +121,11 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
+  // Use useCallback to prevent toast content component from being re-rendered on every App re-render
   // Handle closing a toast
-  const handleToastClose = (id) => {
+  const handleToastClose = useCallback((id) => {
     try {
       // Remove toast that user closed from local storage
       const filteredStorage = filterLocalStorage(
@@ -143,10 +145,10 @@ function App() {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, []);
 
   // User can delete liked submissions
-  const onDelete = (id) => {
+  const onDelete = useCallback((id) => {
     setLoading(true);
     try {
       // Find liked submission user wants to delete & remove it
@@ -171,7 +173,7 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return (
     <>

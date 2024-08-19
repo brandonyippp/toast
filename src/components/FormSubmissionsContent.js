@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { Typography } from "@mui/material";
 import SubmissionCard from "./SubmissionCard";
 import Content from "./ui/Content";
@@ -23,4 +23,4 @@ const FormSubmissionsContent = ({
   );
 };
 
-export default FormSubmissionsContent;
+export default memo(FormSubmissionsContent);

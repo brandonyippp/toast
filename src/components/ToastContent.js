@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import Toast from "./SubmissionToast";
 import Content from "./ui/Content";
 
@@ -32,4 +32,4 @@ const ToastContent = ({ toasts = null, handleClose, ...props }) => {
   );
 };
 
-export default ToastContent;
+export default memo(ToastContent);
