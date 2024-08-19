@@ -1,8 +1,8 @@
 import React, { memo } from "react";
-import Toast from "./SubmissionToast";
+import SubmissionToast from "./SubmissionToast";
 import Content from "./ui/Content";
 
-const ToastContent = ({ toasts = null, handleClose, ...props }) => {
+const ToastContent = ({ toasts = [], handleClose, ...props }) => {
   return (
     <Content
       sx={{
@@ -19,10 +19,12 @@ const ToastContent = ({ toasts = null, handleClose, ...props }) => {
       }}
     >
       {toasts.map((toast) => (
-        <Toast
+        <SubmissionToast
           key={toast.id}
           toast={toast}
-          sx={{ whiteSpace: "pre-wrap" }}
+          sx={{
+            whiteSpace: "pre-wrap",
+          }}
           message={`${toast.firstName + " " + toast.lastName}\n${toast.email}`}
           handleClose={handleClose}
           handleToastLike={props.handleToastLike}
