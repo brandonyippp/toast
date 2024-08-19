@@ -17,7 +17,7 @@ const SubmissionToast = ({
   const [showBorder, setShowBorder] = useState(true);
 
   // Make new toasts surrounded by red border (all toasts considered new on refresh - potentially could be classified as a bug
-  // Potentially better alternative may to just display a date on all toasts
+  // TODO: Potentially better alternative may to just display a date on all toasts
   useEffect(() => {
     setTimeout(() => {
       setShowBorder(false);

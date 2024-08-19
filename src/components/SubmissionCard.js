@@ -8,6 +8,8 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
+//TODO: Maybe add red border to newly-liked forms like we do in SubmissionToast.js, up for debate on whether it is a desirable feature
+
 const SubmissionCard = ({ submission, onDelete }) => {
   return (
     <Card sx={{ display: "flex", marginBottom: 2, position: "relative" }}>
