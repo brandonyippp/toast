@@ -12,7 +12,7 @@ const FormSubmissionsContent = ({
   return (
     <Content sx={{ marginTop: 3 }}>
       <Typography variant="h4">{title}</Typography>
-      {liked_submissions.map((submission, key) => (
+      {liked_submissions.map((submission) => (
         <SubmissionCard
           key={submission.id}
           submission={submission}
